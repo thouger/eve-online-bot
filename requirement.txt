@@ -1,0 +1,6 @@
+mss
+pygetwindow
+loguru
+numpy
+pyautogui
+opencv-python
