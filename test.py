@@ -1,7 +1,7 @@
-
 import os
 import sys
 from PIL import Image
+from init import *
 
 # 获取当前脚本的目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -11,6 +11,7 @@ parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 sys.path.append(parent_dir)
 from libs.screenshot import *
 from libs.action import jump
+from libs.times import *
 
 def split_and_save_image(image, coords):
     """
@@ -62,7 +63,15 @@ def main():
 
     # find_and_mark_images(target_image_path, screenshots_dir,0.95)
 
+@timing_decorator
+def test():
+    # location = find_target("navigation\stargate.png", threshold=0.8)
+    # print(f"location:{location}")
+    test_template_matching("navigation\stargate.png", threshold=0.8)
+
 if __name__ == "__main__":
     import time
     # time.sleep(2)
-    main()
+    # main()
+    # capture(save=True)
+    test()

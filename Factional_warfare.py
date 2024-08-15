@@ -1,51 +1,71 @@
+import win32api
+import win32con
 import pyautogui
 from loguru import logger
+from libs.screenshot import *
+import time
 
+def find_not_found():
+    """
+    查找屏幕上的 'not_found.png' 图像。
 
-def find_NVY():
-    logger.info('is_NVY')
-
-    loc = pyautogui.locateOnScreen('Factional_warfare/Medium NVY.png', confidence=.8)
+    :return: 如果找到返回位置 (left, top)，否则返回 None。
+    """
+    logger.info('Finding not found...')
+    loc = find_target('Factional_warfare/not_found.png', threshold=0.8)
     if loc:
-        logger.info('find Medium NVY')
         return loc
-    else:
-        logger.info('not find Medium NVY')
+    return None
 
-    loc = pyautogui.locateOnScreen('Factional_warfare/Small NVY.png', confidence=.8)
+def find_five_degrees():
+    """
+    查找屏幕上的 '5_degrees.png' 图像。
+
+    :return: 如果找到返回位置 (left, top)，否则返回 None。
+    """
+    logger.info('Finding 5 degrees...')
+    loc = find_target('Factional_warfare/5_degrees.png', threshold=0.8, activation=True)
     if loc:
-        logger.info('find Small NVY')
         return loc
-    else:
-        logger.info('not find Small NVY')
+    return None
 
-    return False
+def click_five_degrees():
+    """
+    点击屏幕上的 '5_degrees.png' 图像，同时按住 'v' 键。
 
-def wrap_NVY(loc):
-    logger.info('wrap_NVY')
-    x, y, w, h = loc
-    #右键点击
-    pyautogui.click(x, y, button='left')
-    pyautogui.click(x, y, button='right')
-    loc = pyautogui.locateOnScreen('Factional_warfare/wrap_0.png', confidence=.8)
-    x, y, w, h = loc
-    #左键点击
-    pyautogui.click(x, y, button='left')
+    :return: 如果找到返回位置 (left, top)，否则返回 None。
+    """
+    loc = find_five_degrees()
+    if loc:
+        x, y = loc
+        # 移动到目标位置
+        pyautogui.moveTo(x, y+80)
 
+        # 按下 'v' 键
+        win32api.keybd_event(0x56, 0, 0, 0)  # 0x56 是 'v' 键的虚拟键码
+        time.sleep(0.1)  # 添加短暂延迟，确保按键按下被识别
 
-    #进入轨道
-    loc = pyautogui.locateOnScreen('Factional_warfare/加速轨道.png', confidence=.8)
-    x, y, w, h = loc
-    #按住d再按x,y坐标
-    pyautogui.keyDown('d')
-    pyautogui.click(x, y, button='left')
-    pyautogui.keyUp('d')
+        # 点击鼠标左键
+        pyautogui.click()
 
+        # 松开 'v' 键
+        win32api.keybd_event(0x56, 0, win32con.KEYEVENTF_KEYUP, 0)
+        time.sleep(0.1)  # 添加短暂延迟，确保按键释放被识别
+
+        return loc
+    return None
 
 def main():
-    find_nvy = find_NVY()
-    if find_nvy:
-        wrap_NVY(find_nvy)
+    while True:
+        try:
+            loc = click_five_degrees()
+            if not find_not_found():
+                logger.info('Not found, waiting...')
+            else:
+                logger.info('Found, waiting...')
+        except Exception as e:
+            logger.error(f"Error in main: {e}")
+            continue
 
 if __name__ == '__main__':
     main()

@@ -1,6 +1,24 @@
 import platform
 import mss
 import os
+import pyautogui
+import time
+
+"""
+    实时显示当前鼠标坐标的函数。
+    """
+def display_mouse_position():
+    try:
+        while True:
+            # 获取当前鼠标坐标
+            x, y = pyautogui.position()
+            # 打印当前鼠标坐标
+            print(f"Mouse position: X={x} Y={y}", end='\r')
+            # 每隔0.1秒刷新一次
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        # 用户按下Ctrl+C时退出循环
+        print("\nProgram terminated.")
 
 def get_screen_resolution():
     system = platform.system()
@@ -79,4 +97,4 @@ def main():
     capture_and_save(coords)
 
 if __name__ == "__main__":
-    main()
+    display_mouse_position()

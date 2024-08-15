@@ -1,227 +1,141 @@
 import os
-import mss
-import pygetwindow as gw
 import cv2
+import mss
 import numpy as np
+import pygetwindow as gw
 from loguru import logger
-from config import config
 
-def get_eve_window():
+def get_window(title="EVE - "):
     """
-    获取标题中包含'EVE - '的窗口。
-
+    获取指定标题的窗口对象。
+    
+    :param title: 窗口的标题关键词
     :return: 返回找到的第一个窗口对象
     """
-    windows = gw.getWindowsWithTitle('EVE - ')
-    logger.info(windows[0].title)
+    windows = gw.getWindowsWithTitle(title)
     if not windows:
-        raise Exception("没有找到标题中包含'Cealym'的窗口。")
+        raise Exception(f"未找到标题中包含'{title}'的窗口。")
+    # logger.info(f"找到窗口：{windows[0].title}")
     return windows[0]
 
-def get_window_with_title(title_keyword):
+def capture_screen(window, save_dir="screenshots", file_name="full_screen.png"):
     """
-    根据标题关键字获取窗口。
-
-    :param title_keyword: 窗口标题中的关键字
-    :return: 找到的第一个窗口对象
-    """
-    windows = gw.getWindowsWithTitle(title_keyword)
-    if not windows:
-        raise Exception(f"没有找到标题中包含'{title_keyword}'的窗口。")
-    return windows[0]
-
-def calculate_grid_coordinates(window_width, window_height, rows=2, cols=4):
-    """
-    计算将窗口分割成指定行列的区域的坐标。
-
-    :param window_width: 窗口宽度
-    :param window_height: 窗口高度
-    :param rows: 分割行数
-    :param cols: 分割列数
-    :return: 包含每个区域坐标的列表
-    """
-    region_width = window_width // cols
-    region_height = window_height // rows
-
-    coords = []
-    for row in range(rows):
-        for col in range(cols):
-            left = col * region_width
-            top = row * region_height
-            coords.append({
-                "name": f"region_{row}_{col}",
-                "left": left,
-                "top": top,
-                "width": region_width,
-                "height": region_height
-            })
-
-    return coords
-
-def capture_window(save_dir="screenshots"):
-    """
-    对指定窗口进行截图并保存。
-
-    :param window: 窗口对象
+    捕获指定窗口的屏幕截图并保存。
+    
+    :param window: 要捕获的窗口对象
     :param save_dir: 保存截图的目录
-    :return: 返回截图的图像数据
+    :param file_name: 截图文件的名称
+    :return: 截图文件的完整路径
     """
-
-    window = config.get_window()
+    os.makedirs(save_dir, exist_ok=True)
     with mss.mss() as sct:
-        monitor = {
-            "top": window.top,
-            "left": window.left,
-            "width": window.width,
-            "height": window.height
-        }
+        monitor = {"top": window.top, "left": window.left, "width": window.width, "height": window.height}
         img = sct.grab(monitor)
+        file_path = os.path.join(save_dir, file_name)
+        while True:
+            try:
+                mss.tools.to_png(img.rgb, img.size, output=file_path)
+                break
+            except Exception as e:
+                logger.error(f"Error in capture_screen: {e}")
+                continue
+        # logger.info(f"截图已保存至 {file_path}")
+        return file_path
 
-        os.makedirs(save_dir, exist_ok=True)
-        file_path = os.path.join(save_dir, "full_window.png")
-        mss.tools.to_png(img.rgb, img.size, output=file_path)
-        # logger.info(f"完整窗口截图已保存至 {file_path}")
-        
-        return img
-
-def match_template_color(screenshot_img, target_img, threshold=0.8):
+def match_template(img_path, template_path, method=cv2.TM_CCOEFF_NORMED, threshold=0.8):
     """
-    在彩色截图中匹配模板图像。
+    对指定图像进行模板匹配并返回匹配区域的中心坐标。
+    
+    :param img_path: 需要搜索的图像文件路径
+    :param template_path: 作为模板的图像文件路径
+    :param method: OpenCV提供的模板匹配方法
+    :param threshold: 匹配的阈值，只有高于此阈值的结果会被返回
+    :return: 匹配到的中心位置坐标，如果没有找到合适的匹配则返回None
+    """
+    # 读取图像和模板
+    img = cv2.imread(img_path, cv2.IMREAD_COLOR)
+    template = cv2.imread(template_path, cv2.IMREAD_COLOR)
+    template_height, template_width = template.shape[:2]
+    
+    # 执行模板匹配
+    result = cv2.matchTemplate(img, template, method)
+    
+    # 获取匹配结果大于阈值的坐标
+    locations = np.where(result >= threshold)
+    
+    # 如果没有匹配结果，返回None
+    if locations[0].size == 0:
+        print("未找到匹配项。")
+        return None
+    
+    # 获取匹配到的第一个结果的左上角坐标
+    top_left = (locations[1][0], locations[0][0])
+    
+    # 计算中心点坐标
+    center_x = top_left[0] + template_width // 2
+    center_y = top_left[1] + template_height // 2
+    # print(f"匹配到的中心坐标：({center_x}, {center_y})")
+    # 返回中心坐标
+    return (center_x, center_y)
 
-    :param screenshot_img: 截图图像
-    :param target_img: 模板图像
-    :param threshold: 匹配阈值
+def mark_matches(img_path, locations, template_size, output_dir="screenshots", file_suffix=""):
+    """
+    在图像中标记匹配的位置并保存。
+    
+    :param img_path: 被搜索的原始图像路径
+    :param locations: 匹配到的坐标位置列表
+    :param template_size: 模板图像的尺寸（高度，宽度）
+    :param output_dir: 标记后的图像保存目录
+    :param file_suffix: 保存的文件后缀名，用于标识文件
+    """
+    img = cv2.imread(img_path)
+    top_left = (locations[0] - template_size[1] // 2, locations[1] - template_size[0] // 2)
+    bottom_right = (locations[0] + template_size[1] // 2, locations[1] + template_size[0] // 2)
+    # 绘制矩形
+    cv2.rectangle(img, top_left, bottom_right, (0, 255, 0), 2)
+    
+    # for point in zip(*locations):  # 反转 x, y 坐标位置
+    #     top_left = point
+    #     bottom_right = (top_left[0] + template_size[1], top_left[1] + template_size[0])
+    #     cv2.rectangle(img, top_left, bottom_right, (0, 255, 0), 2)
+    marked_path = os.path.join(output_dir, f"marked_{file_suffix}.png")
+    cv2.imwrite(marked_path, img)
+    logger.info(f"标记图像已保存至 {marked_path}")
+
+def find_target(target,threshold=0.8,activation=False):
+    """
+    查找目标图像。
+    
+    :param target: 目标图像的路径
     :return: 匹配到的位置列表
     """
-    # 在彩色图像上进行模板匹配
-    result = cv2.matchTemplate(screenshot_img, target_img, cv2.TM_CCOEFF_NORMED)
-    locations = np.where(result >= threshold)
-    return locations
-
-
-def find_and_mark_images(target_image_path, screenshots_dir, threshold=0.8):
-    """
-    在截图中查找目标图像的位置并标记所有匹配的位置。
-
-    :param target_image_path: 目标图像路径
-    :param screenshots_dir: 截图目录
-    :param threshold: 匹配阈值
-    """
-    target_img = cv2.imread(target_image_path, cv2.IMREAD_COLOR)
-    target_height, target_width = target_img.shape[:2]
-
-    for root, _, files in os.walk(screenshots_dir):
-        for file in files:
-            file_path = os.path.join(root, file)
-
-            # 检查文件名是否已经被标记过
-            if file.startswith("marked_"):
-                continue  # 如果文件已经被标记过，则跳过
-
-            screenshot_img = cv2.imread(file_path, cv2.IMREAD_COLOR)
-
-            # 使用抽象出的函数进行匹配
-            locations = match_template_color(screenshot_img, target_img, threshold)
-
-            if len(locations[0]) > 0:
-                logger.info(f"Found target in {file_path} at positions with confidence > {threshold}")
-
-                # 在所有匹配的位置上标记
-                for pt in zip(*locations[::-1]):
-                    bottom_right = (pt[0] + target_width, pt[1] + target_height)
-                    cv2.rectangle(screenshot_img, pt, bottom_right, (0, 255, 0), 2)
-
-                # 保存标记后的图像
-                marked_file_path = os.path.join(root, f"marked_{file}")
-                cv2.imwrite(marked_file_path, screenshot_img)
-                # logger.info(f"Saved marked image at {marked_file_path}")
-
-
-
-def find_image_in_screenshots(target_image_path, screenshots_dir, threshold=0.8):
-    """
-    在截图中查找目标图像的第一个匹配位置并对其进行标记保存。
-
-    :param target_image_path: 目标图像路径
-    :param screenshots_dir: 截图目录
-    :param threshold: 匹配阈值
-    :return: 目标图像的第一个匹配位置 (left, top) 或 None 如果未找到
-    """
-    capture("screenshots")
-    target_img = cv2.imread(target_image_path, cv2.IMREAD_COLOR)
-    target_height, target_width = target_img.shape[:2]
-
-    for root, _, files in os.walk(screenshots_dir):
-        for file in files:
-            if("marked_" in file):
-                continue
-            file_path = os.path.join(root, file)
-            screenshot_img = cv2.imread(file_path, cv2.IMREAD_COLOR)
-
-            # 使用匹配模板进行查找
-            locations = match_template_color(screenshot_img, target_img, threshold)
-
-            if len(locations[0]) > 0:
-                # 获取第一个匹配点的位置
-                max_loc = (locations[1][0], locations[0][0])
-                logger.info(f"Found target in {target_image_path} at {file_path} with confidence > {threshold}")
-
-                # 在图像上绘制矩形框进行标记
-                top_left = max_loc
-                bottom_right = (top_left[0] + target_width, top_left[1] + target_height)
-                cv2.rectangle(screenshot_img, top_left, bottom_right, (0, 255, 0), 2)
-
-                # 保存标记后的图像
-                marked_file_path = os.path.join(root, f"marked_{file}")
-                cv2.imwrite(marked_file_path, screenshot_img)
-                logger.info(f"Saved marked image at {marked_file_path}")
-
-                return max_loc
-
-    # logger.info(f"{target_image_path} image not found in screenshots.")
-    return None
-            
-def test_image_matching_and_marking(target_image_path, screenshots_dir, threshold=0.8):
-    """
-    测试目标图像在截图中的匹配和标记功能。
-
-    :param target_image_path: 目标图像路径
-    :param screenshots_dir: 截图目录
-    :param threshold: 匹配阈值
-    """
-    # 获取窗口并进行截图
-    # try:
-    #     window = get_window_with_title('EVE - ')  # 根据需要修改窗口标题关键字
-    #     capture_window(window, screenshots_dir)
-    #     logger.info("Captured window screenshot.")
-    # except Exception as e:
-    #     logger.info(f"Error capturing window: {e}")
-    #     return
-
-    # 查找目标图像
-    logger.info("Testing find_image_in_screenshots...")
-    match_position = find_image_in_screenshots(target_image_path, screenshots_dir, threshold)
-    if match_position:
-        logger.info(f"Match found at position: {match_position}")
+    window = get_window()
+    screenshot_path = capture_screen(window)
+    locations = match_template(img_path = screenshot_path, template_path = target,threshold=threshold)
+    if locations:
+        # logger.info("找到目标图像。")
+        if activation:
+            window.activate()
+        return locations
     else:
-        logger.info("No match found.")
+        # logger.info("未找到目标图像。")
+        return False
 
-    # 标记目标图像
-    logger.info("Testing find_and_mark_images...")
-    find_and_mark_images(target_image_path, screenshots_dir, threshold)
-
-def capture(save_dir="screenshots"):
+def test_template_matching(target_path,threshold=0.8):
     """
-    获取带有特定标题的窗口，截取该窗口的截图，并计算窗口的分割区域坐标。
-
-    :param save_dir: 保存截图的目录
-    :return: 截图的图像数据和分割区域的坐标列表
+    测试模板匹配功能。
+    
+    执行全屏截图并对指定模板进行匹配测试，验证匹配的正确性并标记匹配位置。
     """
+    window = get_window()
+    screenshot_path = capture_screen(window)
+    locations = match_template(img_path = screenshot_path,template_path =  target_path, threshold=threshold)
+    if locations:
+        template_img = cv2.imread(target_path, cv2.IMREAD_COLOR)
+        mark_matches(screenshot_path, locations, (template_img.shape[0], template_img.shape[1]), file_suffix="test")
+        logger.info("匹配成功并标记。")
+    else:
+        logger.info("测试中未找到匹配项。")
 
-    # 截图
-    img = capture_window(save_dir)
-
-    # 计算分割坐标
-    # coords = calculate_grid_coordinates(window.width, window.height)
-
-    return img
+if __name__ == "__main__":
+    test_template_matching('Factional_warfare/5_degrees.png', threshold=0.8)

@@ -11,20 +11,20 @@ def is_wrapping():
     :return: 如果找到返回 True，否则返回 False。
     """
     logger.info('Checking if wrapping...')
-    loc = find_image_in_screenshots('navigation/wrapping.png', 'screenshots', threshold=0.8)
+    loc = find_target('navigation/wrapping.png', threshold=0.8)
     if loc:
         logger.info('Wrapping detected.')
         return True
     return False
 
-def find_targate():
+def find_stargate():
     """
     查找屏幕上的 'stargate.png' 图像。
 
     :return: 如果找到返回位置 (left, top)，否则返回 None。
     """
-    logger.info('Finding targate...')
-    loc = find_image_in_screenshots('navigation/stargate.png', 'screenshots', threshold=0.8)
+    logger.info('Finding stargate...')
+    loc = find_target('navigation/stargate.png', threshold=0.8)
     if loc:
         return loc
     return None
@@ -35,9 +35,12 @@ def click_targate():
     """
     while True:
         try:
-            position = find_targate()
+            position = find_stargate()
             if position:
                 x, y = position
+                # 鼠标移动到目标位置
+                # pyautogui.moveTo(x, y)
+
                 # 先按住d
                 # 再点击那个星门
                 # 再松开d
@@ -58,7 +61,7 @@ def is_jumping():
     :return: 如果找到返回 True，否则返回 False。
     """
     logger.info('Checking if jumping...')
-    loc = find_image_in_screenshots('navigation/jumping.png', 'screenshots', threshold=0.8)
+    loc = find_target('navigation/jumping.png', threshold=0.8)
     if loc:
         print(f"Jumping detected at {loc}.")
         logger.info('Jumping detected.')
@@ -76,7 +79,7 @@ def run():
             while True:
                 if is_jumping():
                     while True:
-                        if find_targate():
+                        if find_stargate():
                             click_targate()
                             break
                     break

@@ -2,6 +2,11 @@
 
 class Config:
     _instance = None
+    region = {
+        'stargate':{
+            'navigation/stargate.png':['0_3','1_3']
+        }
+    }
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
