@@ -67,7 +67,7 @@ def main():
 def test():
     # location = find_target("navigation\stargate.png", threshold=0.8)
     # print(f"location:{location}")
-    test_template_matching("navigation\stargate.png", threshold=0.8)
+    test_template_matching("navigation\stargate.png", threshold=0.1)
 
 if __name__ == "__main__":
     import time

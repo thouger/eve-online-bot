@@ -11,7 +11,7 @@ def is_wrapping():
     :return: 如果找到返回 True，否则返回 False。
     """
     logger.info('Checking if wrapping...')
-    loc = find_target('navigation/wrapping.png', threshold=0.8)
+    loc = find_target('navigation/wrapping.png', threshold=0.1)
     if loc:
         logger.info('Wrapping detected.')
         return True
@@ -62,7 +62,7 @@ def is_jumping():
     :return: 如果找到返回 True，否则返回 False。
     """
     logger.info('Checking if jumping...')
-    loc = find_target('navigation/jumping.png', threshold=0.8)
+    loc = find_target('navigation/jumping.png', threshold=0.1)
     if loc:
         print(f"Jumping detected at {loc}.")
         logger.info('Jumping detected.')
@@ -76,7 +76,7 @@ def find_1_jump():
     :return: 如果找到返回位置 (left, top)，否则返回 None。
     """
     logger.info('Finding 1_jump...')
-    loc = find_target('navigation/1_jump.png', threshold=0.8)
+    loc = find_target('navigation/1_jump.png', threshold=0.1)
     if loc:
         return loc
     return None
