@@ -1,7 +1,7 @@
 import os
 import sys
 from PIL import Image
-from init import *
+import numpy as np
 
 # 获取当前脚本的目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -13,61 +13,33 @@ from libs.screenshot import *
 from libs.action import jump
 from libs.times import *
 
-def split_and_save_image(image, coords):
-    """
-    分割截图并保存每个区域。
-
-    :param image: 原始截图的图像数据
-    :param coords: 每个区域的坐标列表
-    """
-    img = Image.frombytes("RGB", image.size, image.rgb)
-
-    save_dir = "screenshots"
-    os.makedirs(save_dir, exist_ok=True)
-
-    for region in coords:
-        cropped_img = img.crop((
-            region['left'],
-            region['top'],
-            region['left'] + region['width'],
-            region['top'] + region['height']
-        ))
-        file_path = os.path.join(save_dir, f"{region['name']}.png")
-        cropped_img.save(file_path)
-        print(f"{region['name']} 区域截图已保存至 {file_path}")
-
-def main():
-
-    # """
-    # 主函数：执行获取窗口、截图并分割保存的流程。
-    # """
-    # window = get_eve_window()
-    
-    # print(f"找到窗口: {window.title}, 大小: {window.width}x{window.height}, 位置: ({window.left}, {window.top})")
-
-    # img = capture_window(window)
-
-    # coords = calculate_grid_coordinates(window.width, window.height)
-
-    # split_and_save_image(img, coords)
-
-    target_image_path = "./navigation/jumping.png"
-    screenshots_dir = "screenshots"
-
-    test_image_matching_and_marking(target_image_path, screenshots_dir)
-
-    # 查找目标图像位置
-    # while True:
-    #     position = find_image_in_screenshots(target_image_path, screenshots_dir,0.95)
-    #     jump(position)
-
-    # find_and_mark_images(target_image_path, screenshots_dir,0.95)
-
 @timing_decorator
 def test():
-    # location = find_target("navigation\stargate.png", threshold=0.8)
-    # print(f"location:{location}")
-    test_template_matching("navigation\stargate.png", threshold=0.1)
+    threshold = 0.8
+    capture = False
+    target_path = f"navigation/mac/stargate.png"
+
+
+    # locations = test_template_matching(f"navigation/{client}/stargate.png", captrue=False,threshold=0.8)
+    lower_color,upper_color = get_dominant_hsv_range(target_path)
+    window = config.get_window()
+    screenshot_path = "screenshots/full_screen.png"
+    if capture:
+        screenshot_path = capture_screen(window)
+
+    # color
+    locations = match_template_with_color_mask(img_path = screenshot_path, lower_color=lower_color, upper_color=upper_color,template_path =  target_path, threshold=threshold)
+    # no colo
+    # locations = match_template(img_path = screenshot_path,template_path =  target_path, threshold=threshold)
+    if locations:
+        locations = [(x * 2, y * 2) for (x, y) in locations]
+        template_img = cv2.imread(target_path, cv2.IMREAD_COLOR)
+        mark_matches(screenshot_path, locations, (template_img.shape[0], template_img.shape[1]), file_suffix="test")
+
+    # locations = test_template_matching(f"navigation/mac/wrapping.png",False,threshold=0.8)
+    if locations:
+        logger.info(f"找到目标位置：{locations}")
+        pyautogui.click(locations[0])
 
 if __name__ == "__main__":
     import time

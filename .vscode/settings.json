@@ -1,0 +1,6 @@
+{
+    "search.exclude": {
+      "**/.history": true,
+      "**/*.pycopy": true
+    }
+}
