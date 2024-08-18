@@ -11,11 +11,15 @@ def jump(position):
             return
         
         x, y = position
-        pyautogui.click(x, y)
-        pyautogui.keyDown('d')
-        pyautogui.click(x, y)
-        pyautogui.keyUp('d')
-        # time.sleep(0.2)
+        for _ in range(3):
+            pyautogui.click(x, y)
+            pyautogui.keyDown('d')
+            pyautogui.click(x, y)
+            pyautogui.keyUp('d')
+
+        # 点击完，移动到屏幕中心，避免鼠标遮挡
+        pyautogui.moveTo(671,452)
+        time.sleep(0.85)
         pyautogui.press('1')
         return True
     except Exception as e:
