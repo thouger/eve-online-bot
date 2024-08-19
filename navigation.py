@@ -42,9 +42,10 @@ def click_targate():
     """
     while True:
         try:
+            logger.info('正在点击星门。')
             position = find_stargate()
             jump_stargate(position)
-            time.sleep(2)
+            time.sleep(3)
             # 确保点击星门是成功的
             _find_0ms = find_0ms()
             if not _find_0ms:
@@ -152,11 +153,11 @@ def run():
     运行主循环以执行星门导航。
     """
     while True:
-        # 开始先点击星门
-        click_targate()
-        logger.info('开始寻找下一个星门。')
-        
-        found_next_stargate = False  # 引入一个标志变量
+        found_next_stargate = False  # 引入一个标志变量，控制click_targate的执行
+
+        if not found_next_stargate:  # 只有在没有找到星门时，才执行click_targate
+            click_targate()
+            logger.info('开始寻找下一个星门。')
 
         while True:
             logger.info('等待跃迁...')
@@ -173,20 +174,18 @@ def run():
                                 click_station()
                                 if find_wrapping():
                                     break
-                            stargate_location = find_stargate()
-                            if stargate_location:
-                                logger.info('跳跃完成。准备点击下一个星门。')
-                                jump_stargate(stargate_location)
+                            if find_stargate():
                                 found_next_stargate = True  # 设置标志，准备跳出所有循环
                                 break
                         if found_next_stargate:  # 检查标志位并跳出上一层循环
-                            found_next_stargate = True
                             break
-                if found_next_stargate:  # 检查标志位并跳出再上一层循环
-                    break
+                    if found_next_stargate:  # 检查标志位并跳出再上一层循环
+                        break
+            if found_next_stargate:  # 检查标志位并跳出再上一层循环
+                break
         if found_next_stargate:  # 检查标志位并重新开始最外层循环
             continue
-
+        
 if __name__ == '__main__':
     run()
     # print(find_0_jump() and find_station())

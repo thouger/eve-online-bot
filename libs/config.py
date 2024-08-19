@@ -4,7 +4,8 @@ import pyautogui
 import mss
 
 
-client = "mac"
+# client = "mac"
+client = '4k'
 
 class Config:
     _instance = None

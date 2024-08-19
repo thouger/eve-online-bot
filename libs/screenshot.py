@@ -7,6 +7,7 @@ from loguru import logger
 import pyautogui
 from collections import Counter
 from libs.config import *
+import traceback
 
 class ImageProcessor:
     def __init__(self, config):
@@ -112,19 +113,20 @@ class ImageProcessor:
         if locations[0].size == 0:
             return None
 
+        # logger.info(f'len(locations): {len(locations)}')
         matched_locations = list(zip(locations[1], locations[0]))
-
         if self.config.client == "mac":
             adjusted_locations = [(int(x // 2), int(y // 2)) for (x, y) in matched_locations]
-
+        else:
+            adjusted_locations = matched_locations
         # 调整匹配位置以适应全屏幕坐标
         adjusted_locations = [(x + region_offset[0], y + region_offset[1]) for (x, y) in adjusted_locations]
 
-        # # 输出匹配的原始位置
-        # logger.info(f"match_template - Matched Locations: {matched_locations}")
-        # # 输出调整后的位置
+        # 输出调整后的位置
         # logger.info(f"match_template - Adjusted Locations: {adjusted_locations}")
+        pyautogui.moveTo(adjusted_locations[0][0], adjusted_locations[0][1])
 
+        # traceback.print_stack()
         return adjusted_locations
 
 

@@ -19,7 +19,7 @@ from navigation import *
 def test():
     threshold = 0.8
     capture = False
-    target = f"stargate"
+    target = f"not_found"
     target_path = config.region[target][0]
     locations = image.find_target(target, color=False, threshold=threshold)
     if locations:
@@ -33,6 +33,10 @@ def test():
 
 if __name__ == "__main__":
     import time
+    # 如果输入参数第一个是xy
+    if len(sys.argv) == 2:
+        xy = sys.argv[1]
+        show_mouse_position()
     # time.sleep(2)
     test()
     # find_0_jump()

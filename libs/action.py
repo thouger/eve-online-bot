@@ -1,5 +1,6 @@
 import pyautogui
 import time
+from libs.config import *
 
 """
 假隐跳，点击目标位置后按住 D 键，然后松开 D 键，最后按下 1 键。
@@ -9,17 +10,18 @@ def jump(position):
         if position is None:
             print("No position provided for action.")
             return
-        
         x, y = position
-        for _ in range(3):
-            pyautogui.click(x, y)
-            pyautogui.keyDown('d')
-            pyautogui.click(x, y)
-            pyautogui.keyUp('d')
+        for _ in range(2):
+            print(f"Jumping to position: {x}, {y}")
+            pyautogui.moveTo(x, y)
+            pyautogui.mouseDown()       # 按下鼠标左键
+            pyautogui.keyDown('d')      # 按下'd'键
+            pyautogui.mouseUp()         # 松开鼠标左键
+            pyautogui.keyUp('d')        # 松开'd'键
 
         # 点击完，移动到屏幕中心，避免鼠标遮挡
         pyautogui.moveTo(671,452)
-        time.sleep(0.85)
+        time.sleep(0.3)
         pyautogui.press('1')
         return True
     except Exception as e:
