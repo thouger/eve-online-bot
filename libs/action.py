@@ -11,17 +11,31 @@ def jump(position):
             print("No position provided for action.")
             return
         x, y = position
-        for _ in range(2):
-            print(f"Jumping to position: {x}, {y}")
-            pyautogui.moveTo(x, y)
-            pyautogui.mouseDown()       # 按下鼠标左键
-            pyautogui.keyDown('d')      # 按下'd'键
-            pyautogui.mouseUp()         # 松开鼠标左键
-            pyautogui.keyUp('d')        # 松开'd'键
+        pyautogui.moveTo(x, y)
+
+        # 按下 'd' 键
+        pyautogui.keyDown('d')
+
+        # 确保 'd' 键已经被按下，立即双击
+        pyautogui.mouseDown(button='left')  # 按下鼠标左键
+        pyautogui.mouseUp(button='left')    # 松开鼠标左键
+        pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
+        pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
+        pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
+        pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
+        pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
+        pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
+
+        # 松开 'd' 键
+        pyautogui.keyUp('d')
 
         # 点击完，移动到屏幕中心，避免鼠标遮挡
         pyautogui.moveTo(671,452)
         time.sleep(0.3)
+        # if config.client == "4k":
+        #     time.sleep(0.3)
+        # else:
+        #     time.sleep(0.5)
         pyautogui.press('1')
         return True
     except Exception as e:

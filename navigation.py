@@ -122,6 +122,7 @@ def click_station():
             # 鼠标移动到目标位置
             # pyautogui.moveTo(x, y)
             jump(positions[0])
+            time.sleep(3)
             return True
     except Exception as e:
         return False
@@ -187,6 +188,7 @@ def run():
             continue
         
 if __name__ == '__main__':
+    time.sleep(3)
     run()
     # print(find_0_jump() and find_station())
     # locations = find_1_jump()
