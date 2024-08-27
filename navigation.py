@@ -62,7 +62,7 @@ def jump_stargate(location):
             time.sleep(0.5)
             # 鼠标移动到目标位置
             # pyautogui.moveTo(x, y)
-            jump(location)
+            jump_and_invisible(location)
             time.sleep(3)
             return True
     except Exception as e:
@@ -121,7 +121,7 @@ def click_station():
         if positions:
             # 鼠标移动到目标位置
             # pyautogui.moveTo(x, y)
-            jump(positions[0])
+            jump_and_invisible(positions[0])
             time.sleep(3)
             return True
     except Exception as e:
@@ -180,6 +180,8 @@ def run():
                                 break
                         if found_next_stargate:  # 检查标志位并跳出上一层循环
                             break
+                    elif find_0ms():
+                        click_station()
                     if found_next_stargate:  # 检查标志位并跳出再上一层循环
                         break
             if found_next_stargate:  # 检查标志位并跳出再上一层循环

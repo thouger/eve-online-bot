@@ -10,7 +10,7 @@ parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 # 将上一级目录添加到 sys.path
 sys.path.append(parent_dir)
 from libs.screenshot import *
-from libs.action import jump
+from libs.action import jump_and_invisible
 from libs.times import *
 from libs.config import *
 from navigation import *

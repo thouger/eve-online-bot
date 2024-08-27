@@ -124,7 +124,7 @@ class ImageProcessor:
 
         # 输出调整后的位置
         # logger.info(f"match_template - Adjusted Locations: {adjusted_locations}")
-        pyautogui.moveTo(adjusted_locations[0][0], adjusted_locations[0][1])
+        # pyautogui.moveTo(adjusted_locations[0][0], adjusted_locations[0][1])
 
         # traceback.print_stack()
         return adjusted_locations

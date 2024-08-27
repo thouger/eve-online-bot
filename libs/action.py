@@ -5,6 +5,16 @@ from libs.config import *
 """
 假隐跳，点击目标位置后按住 D 键，然后松开 D 键，最后按下 1 键。
 """
+def jump_and_invisible(position):
+    try:
+        jump(position)
+        time.sleep(0.3)
+        pyautogui.press('1')
+        return True
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
+    
 def jump(position):
     try:
         if position is None:
@@ -30,13 +40,8 @@ def jump(position):
         pyautogui.keyUp('d')
 
         # 点击完，移动到屏幕中心，避免鼠标遮挡
+        # todo: 需要根据屏幕分辨率调整
         pyautogui.moveTo(671,452)
-        time.sleep(0.3)
-        # if config.client == "4k":
-        #     time.sleep(0.3)
-        # else:
-        #     time.sleep(0.5)
-        pyautogui.press('1')
         return True
     except Exception as e:
         print(f"An error occurred: {e}")
