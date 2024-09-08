@@ -8,7 +8,7 @@ from libs.config import *
 def jump_and_invisible(position):
     try:
         jump(position)
-        time.sleep(0.3)
+        time.sleep(0.1)
         pyautogui.press('1')
         return True
     except Exception as e:

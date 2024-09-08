@@ -44,11 +44,12 @@ def click_targate():
         try:
             logger.info('正在点击星门。')
             position = find_stargate()
+            print(position)
             jump_stargate(position)
-            time.sleep(3)
+            time.sleep(2)
             # 确保点击星门是成功的
-            _find_0ms = find_0ms()
-            if not _find_0ms:
+            _find_wrapping = find_wrapping()
+            if _find_wrapping:
                 logger.info('点击星门成功。')
                 break
         except Exception as e:
@@ -149,6 +150,17 @@ def find_not_found():
         return loc
     return None
 
+# 判断过门是否成功
+# 1. 首先判断跃迁不在了
+# 2. 然后判断是否出现正在跳跃
+def finish_wrapping():
+    while not find_wrapping():
+        time.sleep(1)
+        if find_jumping() or find_not_found():
+            return True
+        else:
+            click_targate()
+
 def run():
     """
     运行主循环以执行星门导航。
@@ -166,7 +178,7 @@ def run():
                 logger.info('开始跃迁。')
                 while True:
                     logger.info('等待跃迁完成...准备跳跃')
-                    if find_jumping() or find_not_found():
+                    if finish_wrapping():
                         logger.info('跃迁完成。正在跳跃:')
                         time.sleep(0.5)
                         while True:
