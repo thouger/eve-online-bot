@@ -46,12 +46,13 @@ def click_targate():
             position = find_stargate()
             print(position)
             jump_stargate(position)
-            time.sleep(2)
-            # 确保点击星门是成功的
-            _find_wrapping = find_wrapping()
-            if _find_wrapping:
-                logger.info('点击星门成功。')
-                break
+            break
+            # time.sleep(2)
+            # # 确保点击星门是成功的
+            # _find_wrapping = find_wrapping()
+            # if _find_wrapping:
+            #     logger.info('点击星门成功。')
+            #     break
         except Exception as e:
             traceback.print_exc()
             continue
@@ -150,15 +151,29 @@ def find_not_found():
         return loc
     return None
 
-# 判断过门是否成功
+def find_align():
+    """
+    查找屏幕上的 'align.png' 图像。
+
+    :return: 如果找到返回位置 (left, top)，否则返回 None。
+    """
+    loc = image.find_target('align',color=False)
+    if loc:
+        return loc
+    return None
+
+# 判断跃迁完毕后，过门是否成功，不完成继续点击星门
 # 1. 首先判断跃迁不在了
 # 2. 然后判断是否出现正在跳跃
 def finish_wrapping():
     while not find_wrapping():
         time.sleep(1)
-        if find_jumping() or find_not_found():
+        is_jump = find_jumping() or find_not_found()
+        logger.info(f'is_jump: {is_jump}')
+        if is_jump:
             return True
         else:
+            logger.info('等待跃迁完成...')
             click_targate()
 
 def run():
@@ -186,19 +201,27 @@ def run():
                                 logger.info('跳跃完成。准备点击空间站。')
                                 click_station()
                                 if find_wrapping():
+                                    logger.info('正在跃迁到下一个目标...')
                                     break
                             if find_stargate():
+                                logger.info('找到下一个星门。')
                                 found_next_stargate = True  # 设置标志，准备跳出所有循环
                                 break
                         if found_next_stargate:  # 检查标志位并跳出上一层循环
+                            logger.info('跳出内部循环，重新开始外层循环。')
                             break
                     elif find_0ms():
+                        logger.info('找到0ms，准备点击空间站。')
                         click_station()
                     if found_next_stargate:  # 检查标志位并跳出再上一层循环
                         break
+            # 还有一种是只朝向不跳跃
+            if find_align():
+                found_next_stargate = True
             if found_next_stargate:  # 检查标志位并跳出再上一层循环
                 break
         if found_next_stargate:  # 检查标志位并重新开始最外层循环
+            logger.info('准备重新开始主循环。')
             continue
         
 if __name__ == '__main__':
