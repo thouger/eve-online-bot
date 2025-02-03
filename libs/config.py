@@ -3,19 +3,18 @@ from loguru import logger
 import pyautogui
 import mss
 
-
 client = "mac"
 # client = '4k'
 
 class Config:
     _instance = None
 
-    # 第 1 块（左下角）：(0.0, 0.0, 1/3, 1.5/3)
-    # 第 2 块（中下）：(1/3, 0.0, 2/3, 1.5/3)
-    # 第 3 块（右下角）：(2/3, 0.0, 6/6, 1.5/3)
-    # 第 4 块（左上角）：(0.0, 1.5/3, 1/3, 3/3)
-    # 第 5 块（中上）：(1/3, 1.5/3, 2/3, 3/3)
-    # 第 6 块（右上角）：(2/3, 1.5/3, 6/6, 3/3)
+    # 第 1 块（左上角）：(0.0, 0.0, 1/3, 1.5/3)
+    # 第 2 块（中上）：(1/3, 0.0, 2/3, 1.5/3)
+    # 第 3 块（右上角）：(2/3, 0.0, 6/6, 1.5/3)
+    # 第 4 块（左下角）：(0.0, 1.5/3, 1/3, 3/3)
+    # 第 5 块（中下）：(1/3, 1.5/3, 2/3, 3/3)
+    # 第 6 块（右下角）：(2/3, 1.5/3, 6/6, 3/3)
     region = {
         'stargate': (f'navigation/{client}/stargate.png', (2/3, 0.0, 6/6, 3/3)),  # 第6块（右上角）+ 第3块（右下角）合并
         'station': (f'navigation/{client}/station.png', (2/3, 0.0, 6/6, 3/3)),  # 第6块（右上角）+ 第3块（右下角）合并
@@ -26,6 +25,7 @@ class Config:
         '0_jump': (f'navigation/{client}/0_jump.png', (0.0, 0, 1/3, 1.5/3)),  # 第四块（左上角）
         'not_found': (f'navigation/{client}/not_found.png', (2/3, 0.0, 3/3, 1.5/3)),  # 第六块（右上角）
         '0ms': (f'navigation/{client}/0ms.png', (1/3, 1.5/3, 2/3, 3/3)),  # 第二块（中下）
+        'no_scan_result': (f'navigation/{client}/no_scan_result.png', (2/3, 1.5/3, 6/6, 3/3)),  # 右下角区域
     }
 
     def __init__(self) -> None:
@@ -58,7 +58,6 @@ class Config:
             cls._instance.window = None  # 初始化共享变量
         return cls._instance
 
-    
 def get_window_by_title(title = "EVE - "):
     """
     获取指定标题的窗口对象。

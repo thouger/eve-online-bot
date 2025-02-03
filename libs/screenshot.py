@@ -140,7 +140,7 @@ class ImageProcessor:
         cv2.imwrite(marked_path, img)
 
     def find_target(self, category_key, color=True, threshold=0.8):
-        """
+        """l
         在屏幕的指定区域查找目标图像。
         
         :param category_key: 区域的键值，用于获取Config中的区域范围。
@@ -151,6 +151,7 @@ class ImageProcessor:
         # 获取截图和区域的偏移量
         screenshot_path, (start_x, start_y) = self.capture_screen(category_key)
 
+        print(f"category_key: {category_key}")
         template_path = self.config.region[category_key][0]
         if color:
             lower_color, upper_color = self.get_dominant_hsv_range(template_path)

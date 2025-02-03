@@ -216,8 +216,8 @@ def run():
                     if found_next_stargate:  # 检查标志位并跳出再上一层循环
                         break
             # 还有一种是只朝向不跳跃
-            if find_align():
-                found_next_stargate = True
+            # if find_align():
+            #     found_next_stargate = True
             if found_next_stargate:  # 检查标志位并跳出再上一层循环
                 break
         if found_next_stargate:  # 检查标志位并重新开始最外层循环
