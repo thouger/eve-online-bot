@@ -19,33 +19,65 @@ def jump(position):
     try:
         if position is None:
             print("No position provided for action.")
-            return
+            return False
+
         x, y = position
+
+        # 移动鼠标到指定坐标
         pyautogui.moveTo(x, y)
 
-        # 按下 'd' 键
-        pyautogui.keyDown('d')
+        # 按下鼠标左键
+        pyautogui.mouseDown(button='left')
 
-        # 确保 'd' 键已经被按下，立即双击
-        pyautogui.mouseDown(button='left')  # 按下鼠标左键
-        pyautogui.mouseUp(button='left')    # 松开鼠标左键
-        pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
-        pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
-        pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
-        pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
-        pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
-        pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
+        # 按住0.5秒
+        time.sleep(0.5)
 
-        # 松开 'd' 键
-        pyautogui.keyUp('d')
+        # 移动鼠标到正上方（y+100）
+        pyautogui.moveTo(x, y - 100)
+
+        # 松开鼠标左键
+        pyautogui.mouseUp(button='left')
 
         # 点击完，移动到屏幕中心，避免鼠标遮挡
         # todo: 需要根据屏幕分辨率调整
-        pyautogui.moveTo(671,452)
+        # pyautogui.moveTo(671, 452)
+
         return True
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
+
+# def jump(position):
+#     try:
+#         if position is None:
+#             print("No position provided for action.")
+#             return
+#         x, y = position
+#         pyautogui.moveTo(x, y)
+
+#         # 按下 'd' 键
+#         pyautogui.keyDown('d')
+
+#         # 确保 'd' 键已经被按下，立即双击
+#         pyautogui.mouseDown(button='left')  # 按下鼠标左键
+#         pyautogui.mouseUp(button='left')    # 松开鼠标左键
+#         pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
+#         pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
+#         pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
+#         pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
+#         pyautogui.mouseDown(button='left')  # 再次按下鼠标左键
+#         pyautogui.mouseUp(button='left')    # 再次松开鼠标左键
+
+#         # 松开 'd' 键
+#         pyautogui.keyUp('d')
+
+#         # 点击完，移动到屏幕中心，避免鼠标遮挡
+#         # todo: 需要根据屏幕分辨率调整
+#         pyautogui.moveTo(671,452)
+#         return True
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+#         return False
     
 def show_mouse_position(interval=0.1):
     """
