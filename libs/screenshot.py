@@ -151,7 +151,7 @@ class ImageProcessor:
         # 获取截图和区域的偏移量
         screenshot_path, (start_x, start_y) = self.capture_screen(category_key)
 
-        print(f"category_key: {category_key}")
+        # print(f"category_key: {category_key}")
         template_path = self.config.region[category_key][0]
         if color:
             lower_color, upper_color = self.get_dominant_hsv_range(template_path)

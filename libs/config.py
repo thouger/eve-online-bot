@@ -18,6 +18,8 @@ class Config:
     region = {
         'stargate': (f'navigation/{client}/stargate.png', (2/3, 0.0, 6/6, 3/3)),  # 第6块（右上角）+ 第3块（右下角）合并
         'station': (f'navigation/{client}/station.png', (2/3, 0.0, 6/6, 3/3)),  # 第6块（右上角）+ 第3块（右下角）合并
+        'keepstar': (f'navigation/{client}/keepstar.png', (2/3, 0.0, 6/6, 3/3)),  # 第6块（右上角）+ 第3块（右下角）合并
+
         'wrapping1': (f'navigation/{client}/warpping1.png', (1/3, 1.5/3, 2/3, 3/3)),  # 第二块（中下）
         'wrapping2': (f'navigation/{client}/warpping2.png', (1/3, 1.5/3, 2/3, 3/3)),  # 第二块（中下）
         'jumping': (f'navigation/{client}/jumping.png', (1/3, 1.5/3, 2/3, 3/3)),  # 第二块（中下）

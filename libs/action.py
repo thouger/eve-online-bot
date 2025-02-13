@@ -30,7 +30,7 @@ def jump(position):
         pyautogui.mouseDown(button='left')
 
         # 移动鼠标到正上方（y+100）
-        pyautogui.moveTo(x, y - 100, duration=0.2)
+        pyautogui.moveTo(x, y - 500, duration=0.2)
 
         # 松开鼠标左键
         pyautogui.mouseUp(button='left')
