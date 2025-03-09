@@ -71,6 +71,9 @@ class ImageProcessor:
     def match_template_with_color_mask(self, img_path, template_path, lower_color, upper_color, region_offset, method=cv2.TM_CCOEFF_NORMED, threshold=0.8):
         img = cv2.imread(img_path, cv2.IMREAD_COLOR)
         template = cv2.imread(template_path, cv2.IMREAD_COLOR)
+        
+        # 获取模板的高度和宽度
+        template_height, template_width = template.shape[:2]
 
         img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         template_hsv = cv2.cvtColor(template, cv2.COLOR_BGR2HSV)
@@ -92,16 +95,17 @@ class ImageProcessor:
         # 如果在 macOS 上，需要先缩放匹配位置
         if self.config.client == "mac":
             matched_locations = [(int(x // 2), int(y // 2)) for (x, y) in matched_locations]
+            # 同样缩放模板尺寸
+            template_width = int(template_width // 2)
+            template_height = int(template_height // 2)
 
+        # 计算中心点坐标
+        center_locations = [(x + template_width // 2, y + template_height // 2) for (x, y) in matched_locations]
+        
         # 调整匹配位置以适应全屏幕坐标
-        adjusted_locations = [(x + region_offset[0], y + region_offset[1]) for (x, y) in matched_locations]
+        adjusted_center_locations = [(x + region_offset[0], y + region_offset[1]) for (x, y) in center_locations]
 
-        # # 输出匹配的原始位置
-        # logger.info(f"match_template_with_color_mask - Matched Locations: {matched_locations}")
-        # # 输出调整后的位置
-        # logger.info(f"match_template_with_color_mask - Adjusted Locations: {adjusted_locations}")
-
-        return adjusted_locations
+        return adjusted_center_locations
 
 
     def match_template(self, img_path, template_path, region_offset, method=cv2.TM_CCOEFF_NORMED, threshold=0.8):

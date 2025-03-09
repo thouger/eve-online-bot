@@ -3,8 +3,10 @@ from loguru import logger
 import pyautogui
 import mss
 
-# client = "mac"
-client = '4k'
+client = "mac"
+# client = '4k'
+# jump_type = "covert"
+jump_type = "fake_covert"
 
 class Config:
     _instance = None
@@ -25,9 +27,11 @@ class Config:
         'jumping': (f'navigation/{client}/jumping.png', (1/3, 1.5/3, 2/3, 3/3)),  # 第二块（中下）
         '1_jump': (f'navigation/{client}/1_jump.png', (0.0, 0, 1/3, 1.5/3)),  # 第四块（左上角）
         '0_jump': (f'navigation/{client}/0_jump.png', (0.0, 0, 1/3, 1.5/3)),  # 第四块（左上角）
-        'not_found': (f'navigation/{client}/not_found.png', (2/3, 0.0, 3/3, 1.5/3)),  # 第六块（右上角）
         '0ms': (f'navigation/{client}/0ms.png', (1/3, 1.5/3, 2/3, 3/3)),  # 第二块（中下）
         'no_scan_result': (f'navigation/{client}/no_scan_result.png', (2/3, 1.5/3, 6/6, 3/3)),  # 右下角区域
+        'not_found': (f'navigation/{client}/not_found.png', (2/3, 0.0, 3/3, 1.5/3)),  # 第六块（右上角）
+        'jump': (f'navigation/{client}/jump.png', (2/3, 0.0, 3/3, 1.5/3)),  # 第六块（右上角）
+        'approaching': (f'navigation/{client}/approaching.png', (2/3, 0.0, 3/3, 1.5/3)),  # 第六块（右上角）
     }
 
     def __init__(self) -> None:

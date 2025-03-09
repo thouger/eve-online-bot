@@ -5,6 +5,8 @@ from libs.screenshot import *
 from libs.config import *
 from libs.action import *
 import traceback
+from libs.init import *
+
 
 WAIT_TIME = {
     'JUMP_DELAY': 0.5,
@@ -23,7 +25,8 @@ def click_structure(find_func, structure_name):
     try:
         positions = find_func()
         if positions:
-            jump_and_invisible(positions[0])
+            # jump(positions[0])
+            jump(positions[0])
             time.sleep(3)
             return True
         return False
@@ -61,6 +64,8 @@ def click_targate():
         try:
             logger.info('正在点击星门。')
             position = find_stargate()
+            if not position:
+                continue
             print(position)
             jump_stargate(position)
             break
@@ -74,6 +79,8 @@ def click_targate():
             traceback.print_exc()
             continue
 
+
+
 def jump_stargate(location):
     try:
         if location:
@@ -81,7 +88,7 @@ def jump_stargate(location):
             time.sleep(0.5)
             # 鼠标移动到目标位置
             # pyautogui.moveTo(x, y)
-            jump_and_invisible(location)
+            jump(location)
             time.sleep(3)
             return True
         return False
@@ -89,7 +96,7 @@ def jump_stargate(location):
         logger.error(f"Error in jump_stargate: {e}")  # 使用logger而不是assert
         return False
 
-def find_jumping():
+def click_jumping():
     """
     检查屏幕上是否存在 'jumping.png' 图像。
 
@@ -139,9 +146,9 @@ def find_keepstar():
 
     :return: 如果找到返回位置 (left, top)，否则返回 None。
     """
-    loc = image.find_target('keepstar')
-    if loc:
-        return loc
+    # loc = image.find_target('keepstar')
+    # if loc:
+    #     return loc
     return None
 
 def click_station(positions=None):
@@ -158,7 +165,8 @@ def click_station(positions=None):
         if positions:
             # 鼠标移动到目标位置
             # pyautogui.moveTo(x, y)
-            jump_and_invisible(positions[0])
+            # jump(positions[0])
+            jump(positions[0])
             time.sleep(3)
             return True
         return False
@@ -179,7 +187,8 @@ def click_keepstar(positions=None):
         if positions:
             # 鼠标移动到目标位置
             # pyautogui.moveTo(x, y)
-            jump_and_invisible(positions[0])
+            # jump(positions[0])
+            jump(positions[0])
             time.sleep(3)
             return True
         return False
@@ -208,40 +217,32 @@ def find_not_found():
         return loc
     return None
 
-def find_align():
-    """
-    查找屏幕上的 'align.png' 图像。
-
-    :return: 如果找到返回位置 (left, top)，否则返回 None。
-    """
-    loc = image.find_target('align',color=False)
-    if loc:
-        return loc
-    return None
-
 # 判断跃迁完毕后，过门是否成功，不完成继续点击星门
 # 1. 首先判断跃迁不在了
 # 2. 然后判断是否出现正在跳跃
 def finish_wrapping():
     while not find_wrapping():
         time.sleep(1)
-        is_jump = find_jumping() or find_not_found()
+        # is_jump = find_approaching() or find_not_found()
+        is_jump = Init.find_approaching()
         logger.info(f'is_jump: {is_jump}')
         if is_jump:
             return True
         else:
             logger.info('等待跃迁完成...')
-            click_targate()
+            # click_targate()
+            # jump()
+            time.sleep(0.5)
 
 def run():
     """
     运行主循环以执行星门导航。
     """
     while True:
-        found_next_stargate = False  # 引入一个标志变量，控制click_targate的执行
+        found_next_stargate = False  # 引入一个标志变量，控制click_jump的执行
 
-        if not found_next_stargate:  # 只有在没有找到星门时，才执行click_targate
-            click_targate()
+        if not found_next_stargate:  # 只有在没有找到星门时，才执行click_jump
+            jump()
             logger.info('开始寻找下一个星门。')
 
         while True:
@@ -283,9 +284,8 @@ def run():
                         click_station()
                     if found_next_stargate:  # 检查标志位并跳出再上一层循环
                         break
-            # 还有一种是只朝向不跳跃
-            # if find_align():
-            #     found_next_stargate = True
+            if find_0ms():
+                found_next_stargate = True
             if found_next_stargate:  # 检查标志位并跳出再上一层循环
                 break
         if found_next_stargate:  # 检查标志位并重新开始最外层循环
@@ -293,11 +293,8 @@ def run():
             continue
         
 if __name__ == '__main__':
-    # time.sleep(3)
+    if config.client == 'mac':
+        time.sleep(3)
     run()
-    # print(find_0_jump() and find_station())
-    # locations = find_1_jump()
-    # if locations:
-    #     print(locations)
-    #     pyautogui.moveTo(locations[0][0],locations[0][1])
-    # pyautogui.moveTo(locations[0],locations[1])
+    # jump()
+    # Init()
